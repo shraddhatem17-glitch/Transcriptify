@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Job Analysis</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f7;
+      margin: 0;
+      padding: 20px;
+      color: #002147;
+    }
+    h2 {
+      background-color: #002147;
+      color: #fff;
+      padding: 15px;
+      margin: 0 -20px 20px -20px;
+    }
+    pre {
+      background-color: white;
+      padding: 15px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      min-height: 150px;
+    }
+    .back-btn, .summary-btn {
+      display: inline-block;
+      margin-bottom: 15px;
+      background-color: #002147;
+      color: white;
+      padding: 8px 15px;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .back-btn:hover, .summary-btn:hover {
+      background-color: #00162f;
+    }
+    .loading {
+      color: #555;
+      font-style: italic;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    #summary {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>Job Analysis</h2>
+  <a href="http://127.0.0.1:8000/get_all_jobs" class="back-btn">← Back to Jobs</a>
+
+  <!-- Transcription Section -->
+  <pre id="transcription" class="loading">Loading transcription...</pre>
+
+  <!-- Summary Button -->
+  <button id="loadSummary" class="summary-btn">Show AI Summary</button>
+
+  <!-- Summary Section -->
+  <pre id="summary" class="loading" style="display:none;">Summary will appear here...</pre>
+
+  <script>
+    // job_id will be injected from Flask
+    const jobId = {{ job_id }};
+    const authtoken = localStorage.getItem('authtoken');
+
+    const transcriptionEl = document.getElementById('transcription');
+    const summaryEl = document.getElementById('summary');
+    const summaryBtn = document.getElementById('loadSummary');
+
+    if (!authtoken) {
+      transcriptionEl.textContent = "Error: No authentication token found. Please log in.";
+      transcriptionEl.classList.add('error');
+      summaryBtn.style.display = "none"; // hide summary button if not authenticated
+    } else {
+      // Fetch transcription
+      fetch(`http://127.0.0.1:8000/api/job/${jobId}/get_job_transcription`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'authtoken': authtoken
+        }
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Failed to fetch transcription");
+        return res.json();
+      })
+      .then(data => {
+        if (data && data.data && data.data.transcription) {
+          transcriptionEl.textContent = data.data.transcription;
+          transcriptionEl.classList.remove('loading');
+        } else {
+          transcriptionEl.textContent = "No transcription found.";
+          transcriptionEl.classList.add('error');
+        }
+      })
+      .catch(err => {
+        transcriptionEl.textContent = "Error: " + err.message;
+        transcriptionEl.classList.add('error');
+      });
+
+      // Fetch summary on button click
+      summaryBtn.addEventListener('click', () => {
+        summaryEl.style.display = "block";
+        summaryEl.textContent = "Loading summary...";
+        summaryEl.classList.add('loading');
+        summaryEl.classList.remove('error');
+
+        fetch(`http://127.0.0.1:8000/api/job/${jobId}/get_job_summary`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'authtoken': authtoken
+          }
+        })
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch summary");
+          return res.json();
+        })
+        .then(data => {
+          if (data && data.data && data.data.summary) {
+            summaryEl.textContent = data.data.summary;
+            summaryEl.classList.remove('loading');
+          } else {
+            summaryEl.textContent = "No summary found.";
+            summaryEl.classList.add('error');
+          }
+        })
+        .catch(err => {
+          summaryEl.textContent = "Error: " + err.message;
+          summaryEl.classList.add('error');
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>

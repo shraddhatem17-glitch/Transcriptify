@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Add Job</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background-color: #98b7d5;
+      color: #002147;
+    }
+
+    header {
+      background-color: #002147;
+      color: #ffffff;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 33, 71, 0.2);
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input[type="text"],
+    select,
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f5f5f5;
+    }
+
+    button {
+      margin-top: 20px;
+      padding: 12px;
+      width: 100%;
+      background-color: #002147;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #00152d;
+    }
+
+    .message {
+      margin-top: 20px;
+      font-weight: bold;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>Add New Job</header>
+
+  <div class="container">
+    <form id="jobForm">
+      <label for="title">Job Title:</label>
+      <input type="text" id="title" name="title" required>
+
+      <label for="job_type">Job Type:</label>
+      <select id="job_type" name="job_type" required>
+        <option value="">--Select--</option>
+        <option value="Audio">Audio</option>
+<!--        <option value="Video">Video</option>-->
+      </select>
+
+      <label for="file">Upload File:</label>
+      <input type="file" id="file" name="file" accept="audio/*,video/*" required>
+
+      <button type="submit">Submit</button>
+    </form>
+
+    <div class="message" id="responseMessage"></div>
+  </div>
+
+  <script>
+    document.getElementById('jobForm').addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const authtoken = localStorage.getItem('authtoken');
+      if (!authtoken) {
+        alert('Authorization token not found in localStorage. Please log in.');
+        return;
+      }
+
+      const form = document.getElementById('jobForm');
+      const formData = new FormData(form);
+
+      fetch('http://127.0.0.1:8000/api/job/add_job', {
+        method: 'POST',
+        headers: {
+          'authtoken': authtoken
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        const msgBox = document.getElementById('responseMessage');
+        if (data.message) {
+          msgBox.innerText = 'Job added successfully! Redirecting...';
+          msgBox.style.color = 'green';
+
+          // Redirect after 1.5 seconds
+          setTimeout(() => {
+            window.location.href = 'http://127.0.0.1:8000/get_all_jobs';
+          }, 1500);
+        } else if (data.error) {
+          msgBox.innerText = data.error;
+          msgBox.style.color = 'red';
+        } else {
+          msgBox.innerText = 'Unexpected response from server.';
+          msgBox.style.color = 'red';
+        }
+      })
+      .catch(error => {
+        const msgBox = document.getElementById('responseMessage');
+        msgBox.innerText = 'An error occurred. Please try again.';
+        msgBox.style.color = 'red';
+        console.error('Fetch error:', error);
+      });
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "APP_NAME": "transcriptify",
+  "SECRET_KEY": "88726fd2b17ab8f0cb2dbghb1901bfaefe63800518a9d069",
+  "FLASK_SERVER_PORT": 8000,
+  "UPLOAD_FOLDER": "static",
+  "DB_BASE_URL": "mysql+mysqlconnector://root:root@localhost:3306/",
+  "DB_NAME": "transcriptify",
+  "ENV": "local",
+  "SYS_SECRET_KEY": "Stfbwg52_XCI7C1YyTr--7JdQ5LY49Q92yQCo2fK5kg=",
+  "DEEPGRAM_TOKEN": "80d082f256d07ef89043e86145d6663e487191bc",
+  "GEMINI_API_KEY": "AIzaSyC4PrkbU6mXu5sMxYJ_sSUr07cKv_RkPMo"
+}

@@ -1,0 +1,32 @@
+## activate venv
+source venv/bin/activate
+
+##Create sql db with the name insight_pro
+
+## create a copy file of config.json with name to config_env.json
+cp config.json config_env.json
+
+## set the environment (run second time if first time give error related to keys.json)
+python manage.py set_up_env
+
+## To drop the database 
+python manage.py drop_db
+
+## To drop and create a fresh database with recommended tables
+python manage.py recreate_db
+
+## insert the roles table
+python manage.py init_DB_tables
+
+
+## To run the server on local machine with default host 127.0.0.1 and port 5000
+python manage.py runserver
+
+## Run the script emotion_processor_main.py to live emotion ML model.
+python emotion_processor_main.py
+
+
+## to migrate db
+flask db init
+flask db migrate
+flask db upgrade

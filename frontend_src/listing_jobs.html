@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Job Listings</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #98b7d5;
+      margin: 0;
+      padding: 20px;
+      color: #002147;
+    }
+    h2 {
+      background-color: #002147;
+      color: #ffffff;
+      padding: 15px;
+      margin: 0 -20px 20px -20px;
+    }
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .add-job-button {
+      background-color: #002147;
+      color: #ffffff;
+      padding: 10px 20px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    .add-job-button:hover {
+      background-color: #00162f;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: #ffffff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    th, td {
+      border: 1px solid #d8d5db;
+      padding: 10px;
+      text-align: left;
+      color: #002147;
+    }
+    th {
+      background-color: #d8d5db;
+      font-weight: bold;
+    }
+    tr:nth-child(even) {
+      background-color: #f2f4f7;
+    }
+    .error {
+      color: red;
+      margin-bottom: 20px;
+    }
+    .analyse-button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .analyse-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="top-bar">
+    <h2>All Uploaded Jobs</h2>
+    <a href="http://127.0.0.1:8000/add_job" class="add-job-button">Add Job</a>
+  </div>
+
+  <div id="error" class="error"></div>
+
+  <table id="jobTable" style="display: none;">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Filename</th>
+        <th>Job Type</th>
+        <th>Status</th>
+        <th>Created On</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody id="jobTableBody"></tbody>
+  </table>
+
+  <script>
+    const authtoken = localStorage.getItem('authtoken');
+    const errorDiv = document.getElementById('error');
+    const jobTable = document.getElementById('jobTable');
+    const jobTableBody = document.getElementById('jobTableBody');
+
+    if (!authtoken) {
+      errorDiv.textContent = 'Auth token not found. Please log in first.';
+    } else {
+      fetch('http://127.0.0.1:8000/api/job/get_all_jobs', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'authtoken': authtoken
+        }
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch jobs');
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.data && data.data.length > 0) {
+          jobTable.style.display = 'table';
+          data.data.forEach(job => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${job.id}</td>
+              <td>${job.title}</td>
+              <td>${job.filename}</td>
+              <td>${job.job_type}</td>
+              <td>${job.status}</td>
+              <td>${new Date(job.created_on).toLocaleString()}</td>
+              <td>
+                <button class="analyse-button" onclick="analyseJob(${job.id})">Analyse</button>
+              </td>
+            `;
+            jobTableBody.appendChild(row);
+          });
+        } else {
+          errorDiv.textContent = 'No jobs found.';
+        }
+      })
+      .catch(error => {
+        errorDiv.textContent = 'Error fetching jobs: ' + error.message;
+      });
+    }
+
+    function analyseJob(jobId) {
+      // First fetch the transcription and store in localStorage
+      fetch(`http://127.0.0.1:8000/api/job/${jobId}/get_job_transcription`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'authtoken': authtoken
+        }
+      })
+      .then(response => {
+        if (!response.ok) throw new Error('Failed to fetch transcription');
+        return response.json();
+      })
+      .then(data => {
+        if (data && data.data && data.data.transcription) {
+          localStorage.setItem('transcription', data.data.transcription);
+          window.location.href = `http://127.0.0.1:8000/job/${jobId}/analysis`;
+        } else {
+          alert('No transcription found.');
+        }
+      })
+      .catch(error => {
+        alert('Error fetching transcription: ' + error.message);
+      });
+    }
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+*.egg-info/
+.installed.cfg
+*.egg
+pip-wheel-metadata/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# pytest
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Flask / SQLAlchemy specific
+instance/
+*.db
+*.sqlite3
+migrations/versions/
+
+# Flask Migrate generated folders/files (if you want to ignore migrations)
+# migrations/
+
+# Logs
+*.log
+logs/
+config_env.json
+# MyPy, Pylint, etc.
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+pylint-report.txt
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Encrypted/secret files (manually created)
+secrets.env
+.env
+.env.*
+
+# Temporary files
+static/
+temp/
+migrations/
+log/
+*.tmp
+*.bak
+*.swp
+*.swo
