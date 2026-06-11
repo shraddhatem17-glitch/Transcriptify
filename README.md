@@ -1,2 +1,2 @@
 # Transcriptify
-Collage Project Final Year
+College Project Final Year
